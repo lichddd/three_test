@@ -136,10 +136,10 @@
 </head>
 
 <body>
-  <div id="appC">
+  <!-- <div id="appC">
     <canvas id="canvas" width="480" height="640" style="width:480px;height:640px;"></canvas>
     <div id="cheat"></div>
-  </div>
+  </div> -->
   <div id="loading">
     <div class="spinner">
       <div class="rect1"></div>
@@ -178,7 +178,11 @@
   window.loadingOBJ.count = 10;
 </script>
 <link rel="stylesheet" href="static/index.css" />
-
+<script src="static/three/three.js"></script>
+<script src="static/three/OBJLoader.js"></script>
+<script src="static/three/MTLLoader.js"></script>
+<script src="static/three/OrbitControls.js"></script>
+<script src="static/three/stats.min.js"></script>
 
 <% for (var css in htmlWebpackPlugin.files.css) { %>
   <script type="text/javascript" charset="utf-8">

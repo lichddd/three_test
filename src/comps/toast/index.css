@@ -1,0 +1,27 @@
+.toast{
+		
+    border: 1px solid transparent;
+    border-radius: 5px;
+    font-size: 1em;    
+    color: #ffffff;
+    text-align: center;
+    cursor: inherit;
+    position: fixed;
+    left: 50%;
+    top: 40px;
+    padding: 10px;
+    background-color: #296cff;
+    border-color: #0004ff;
+    opacity:1;
+    transition: top 0.5s,opacity 0.5s;
+}
+.toast.fade{
+    top: 0px;
+    opacity: 0;
+}
+.toast.error
+{
+    color: #ffffff;
+    background-color: #ff5e49;
+    border-color: #ff0000;
+}
