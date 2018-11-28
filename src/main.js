@@ -3,6 +3,7 @@
 import '@/css/main.css';
 import progress from './comps/progress'
 import Toast from './comps/toast'
+import color from './util/color'
 var camera, scene, renderer;
 var geometry, material, mesh;
 var ms;
@@ -24,13 +25,21 @@ function init() {
 	geometry = new THREE.BoxGeometry( 1, 1, 1 );
 	material = new THREE.MeshPhysicalMaterial();
 
-    scene.add(new THREE.AmbientLight(0x444444));
+    scene.add(new THREE.AmbientLight(0xffffff,0.1));
 
-    let light = new THREE.PointLight(0xffffff);
-    light.position.set(0, 50, 0);
-    light.castShadow = true;
+    // let light = new THREE.PointLight(0xffffff);
+    // light.position.set(0, 50, 0);
+    // light.castShadow = true;
 
-    scene.add(light);
+    // scene.add(light);
+
+    let d_light = new THREE.DirectionalLight( 0xffffff, 2 );
+    d_light.position.set(1000, 1000, 1000);
+    d_light.castShadow = true;
+    d_light.target.position.set(0,0,0);
+    scene.add(d_light);
+    initLight();
+
 
 
 
@@ -96,36 +105,111 @@ function loadModel(l){
                             window.p.progressing(0);
                     materials.preload();
                     var objLoader = new THREE.OBJLoader();
-                        objLoader.setMaterials( materials );
+                        // objLoader.setMaterials( materials );
                         objLoader.setPath( 'static/model/OO/' );
-                        window.p.progressend();
                         objLoader.load( `${l}.obj`, function ( object ) {
-                            object.scale.set(0.1,0.1,0.1);
-                            window.obj=object;
-                            scene.add( object );
+                            let geometry = object.children[ 0 ].geometry;
+                            geometry.attributes.uv2 = geometry.attributes.uv;
+                            geometry.center();
+                            window.obj = new THREE.Mesh( geometry, new THREE.MeshBasicMaterial({wireframe:true}) );
+                            window.obj.scale.set(0.1,0.1,0.1);
+                            scene.add( window.obj );
+                          
+
+
+
+                            // object.scale.set(0.1,0.1,0.1);
+                            // window.obj=object;
+                            // scene.add( object );
                             window.p.progressend();
+                            Toast.toast(`模型${l}加载完成`);
                         },(xhr)=>{
 
                             if (xhr.lengthComputable) {
-                                window.p.progressing(xhr.loaded / xhr.total);
+                                window.p.progressing(xhr.loaded / xhr.total,'加载材质');
                             }
     
                         },()=>{
                             window.p.progressend();
-                            Toast.toast('加载失败',Toast.ERROR);
+                            Toast.toast('加载模型失败',Toast.ERROR);
                         });
                     },(xhr)=>{
 
                         if (xhr.lengthComputable) {
-                            window.p.progressing(xhr.loaded / xhr.total);
+                            window.p.progressing(xhr.loaded / xhr.total,'加载模型');
                         }
 
                     },()=>{
                         window.p.progressend();
-                        Toast.toast('加载失败',Toast.ERROR);
+                        Toast.toast('加载材质失败',Toast.ERROR);
                     });
 
 }
+function initLight(){
+    window.groups=[];
+
+    let group =new THREE.Group();
+    group.position.set(50,50,50);
+    group.lookAt(0,0,0);
+    for (let i = 0; i < 9; i++) {
+        let spot_light = new THREE.SpotLight( color.randomColor(), 2, 0, 0.1, 0.5, 2 );
+        console.log(spot_light.color);
+        let o=new THREE.Object3D();
+        group.add(o);
+        spot_light.target=o
+        spot_light.target.position.set(Math.floor(i/3)-1,(i%3)-1,2);
+        group.add(spot_light);
+    }
+    scene.add(group);
+    window.groups.push(group);
+
+    group =new THREE.Group();
+    group.position.set(50,50,-50);
+    group.lookAt(0,0,0);
+    for (let i = 0; i < 9; i++) {
+        let spot_light = new THREE.SpotLight( color.randomColor(), 2, 0, 0.1, 0.5, 2 );
+        console.log(spot_light.color);
+        let o=new THREE.Object3D();
+        group.add(o);
+        spot_light.target=o
+        spot_light.target.position.set(Math.floor(i/3)-1,(i%3)-1,2);
+        group.add(spot_light);
+    }
+    scene.add(group);
+    window.groups.push(group);
+
+    group =new THREE.Group();
+    group.position.set(-50,50,-50);
+    group.lookAt(0,0,0);
+    for (let i = 0; i < 9; i++) {
+        let spot_light = new THREE.SpotLight( color.randomColor(), 2, 0, 0.1, 0.5, 2 );
+        console.log(spot_light.color);
+        let o=new THREE.Object3D();
+        group.add(o);
+        spot_light.target=o
+        spot_light.target.position.set(Math.floor(i/3)-1,(i%3)-1,2);
+        group.add(spot_light);
+    }
+    scene.add(group);
+    window.groups.push(group);
+
+    group =new THREE.Group();
+    group.position.set(-50,50,50);
+    group.lookAt(0,0,0);
+    for (let i = 0; i < 9; i++) {
+        let spot_light = new THREE.SpotLight( color.randomColor(), 2, 0, 0.1, 0.5, 2 );
+        console.log(spot_light.color);
+        let o=new THREE.Object3D();
+        group.add(o);
+        spot_light.target=o
+        spot_light.target.position.set(Math.floor(i/3)-1,(i%3)-1,2);
+        group.add(spot_light);
+    }
+    scene.add(group);
+    window.groups.push(group);
+}
+
+
 function initControls() {
 
  
@@ -178,10 +262,19 @@ function initStats() {
 
 function animate() {
 
-	requestAnimationFrame( animate );
+    requestAnimationFrame( animate );
+    if (window.groups) {
+        window.groups.forEach(element => {
+                element.rotateX(0.01);
+                element.rotateY(0.01);
+                element.rotateZ(0.01);
 
+        });
+    }
     window.stats.update();
     window.controls.update();
-	renderer.render( scene, camera );
+    renderer.render( scene, camera );
+    
+
 
 }
